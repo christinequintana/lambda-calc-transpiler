@@ -1,0 +1,12 @@
+Logic.And Bool.Tru Bool.Tru
+-- Logic.And Bool.Tru Bool.Fls
+-- Logic.Test Bool.Tru Bool.Fls Bool.Tru
+
+Logic.Test Bool.Tru Vars.v Vars.w
+-- Logic.Test Bool.Fls Vars.v Vars.w
+
+-- Pairs.Pair Bool.Fls Bool.Tru
+-- Pairs.Fst (Pairs.Pair Bool.Fls Bool.Tru)
+Pairs.Fst (Pairs.Pair Vars.v Vars.w)
+
+Logic.Xor (Logic.And Bool.Tru Bool.Tru) (Pairs.Fst (Pairs.Pair Bool.Fls Bool.Tru))

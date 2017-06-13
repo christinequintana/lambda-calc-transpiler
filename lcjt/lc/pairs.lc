@@ -1,0 +1,3 @@
+Pair = λf.λs.λb.b f s
+Fst = λp.p Bool.Tru
+Snd = λp.p Bool.Fls

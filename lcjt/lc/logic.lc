@@ -1,0 +1,5 @@
+And = λb.λc.b c Bool.Fls
+Or = λb.λc.b Bool.Tru c
+Not = λb.b Bool.Fls Bool.Tru
+Xor = λb.λc.b (c Bool.Fls Bool.Tru) c
+Test = λl.λm.λn.l m n

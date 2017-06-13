@@ -1,0 +1,2 @@
+Tru = λt.λf.t
+Fls = λt.λf.f

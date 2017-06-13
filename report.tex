@@ -1,0 +1,94 @@
+\documentclass[11pt]{article}
+
+\usepackage{alltt}
+\usepackage{fullpage}
+
+\hyphenation{together evaluated variable}
+
+
+\title{\textbf{A Lambda Calculus to Java Transpiler}}
+\author{Christine Quintana\\\small{cequinta@ucsc.edu}}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Abstract}
+This project explores the evaluation of the lambda calculus by implementing a transpiler in Java. In other words, lambda abstractions are converted into compilable Java methods. The transpiler accepts a file of labeled lambda abstractions as input. The lambda abstractions are then converted into the equivalent Java methods and built into packages. The resulting packages can be used in Java code to evaluate lambda expressions. 
+
+\section{Introduction}
+
+The lambda calculus is a representation of mathematical functions based on functional abstractions and functional applications \cite{church}. Everything is a function in the lambda calculus, and as such can be represented in a programming language that supports function-like objects.
+\\
+\\
+The motivation for this project was to gain further understanding of the evaluation of the lambda calculus by translating lambda abstractions into Java methods. This is achieved through the use of a transpiler, which takes source code in one language as input and outputs source code in another language. With the produced output, implementing lambda abstractions becomes reusable in the sense that the converted expressions can be used in a similar manner to a Java package.
+
+\section{Transpiler Design}
+
+The transpiler will accept lambda abstraction definitions in a file or a series of files, grouped together in a single location. Strict lambda definitions will be enforced in order to correctly convert them to Java methods. In addition, referencing other lambda definitions will follow a strict design. After the conversions, the new method definitions will be saved to Java files in the same structure that the transpiler accepted them. For example, if the transpiler accepted three lambda definition files, three Java files will be created. The output will be saved to a location specified by the user.
+\\
+\\
+Since functions that take multiple arguments exist in the lambda calculus, the transpiler must be able to support their evaluation correctly. This can be achieved by implementing currying, the transformation of a multi-argument function into a sequence of functions \cite{tapl}. In order to perform currying, a library method called \texttt{applyChain} was designed to produce a chain of applied functions.
+
+\section{Implementation in Java}
+
+\subsection{Lambda Function Format}
+
+The lambda expressions that get transpiled into Java code are defined in files with a \texttt{.lc} extension. For example, a file containing only Church Booleans may be called \texttt{bool.lc} with true and false defined as:
+\begin{alltt}
+Tru = \(\lambda\)t.\(\lambda\)f.t
+Fls = \(\lambda\)t.\(\lambda\)f.f
+\end{alltt}
+An expression must be preceded with an identifying name, such as \texttt{Tru}, an equals sign, and be terminated with a line break.
+\\
+\\
+For this project, the \texttt{.lc} files were separated by feature. The features implemented were Church Booleans, logical operations, pairs of values, and the representation of variables. To utilize terms that are defined in another \texttt{.lc} file, the term must be prefixed with the filename where it is defined. For example, logical \texttt{and} is traditionally defined as \texttt{\(\lambda\)b.\(\lambda\)c.b c false}. For use with the transpiler, it is defined in \texttt{logic.lc} as
+\begin{alltt}
+And = \(\lambda\)b.\(\lambda\)c.b c Bool.Fls
+\end{alltt}
+where the \texttt{Fls} term defined in \texttt{bool.lc} is referenced by adding the \texttt{Bool.} prefix to the term. To implement and use variables, a separate \texttt{vars.lc} can be defined that includes all of the variables that will be used in the final evaluation.
+\\
+\\
+A useful feature that comes out of this is that these defined ``primitive" terms can be combined to compose new complex terms. For example, the term below would evaluate to \texttt{Tru}.
+\begin{alltt}
+Logic.Xor (Logic.And Bool.Tru Bool.Tru) (Pairs.Fst (Pairs.Pair Bool.Fls Bool.Tru))
+\end{alltt}
+As such, new complex logical operations can be constructed in a manner similar to how modern programming languages allow for functional compositions. 
+\\
+\\
+In addition to the implemented features, a \texttt{main.lc} file that includes expressions to be evaluated must be defined. In this file, expressions do not have to be labeled with an equals sign, but must include terms that are defined in the other \texttt{.lc} files. The excerpt below illustrates the format of the lambda expressions allowed in \texttt{main.lc}:
+\begin{alltt}
+Logic.And Bool.Tru Bool.Tru
+-- Logic.Test Bool.Tru Vars.v Vars.w
+\end{alltt}
+Just like in the other files, referenced terms must be prefixed with the filename where it is defined. In addition, two dashes at the beginning of a line acts as a comment. The transpiler will not evaluate an expression contained on the same line.
+
+\subsection{The Apply Chain}
+
+The library method \texttt{applyChain} creates a function by applying a series of functions together. It uses Java's \texttt{Function} interface to represent the functions and apply the function to another function.
+\\
+\\
+The method takes as input an arbitrary number of functions. Initially, the temporary apply variable \texttt{tmp} is set to \texttt{null} until the first function in the argument list replaces it. Then, each following function gets applied to the previous function in the argument list. The result is a chain of applied functions.
+
+\section{Future Work}
+
+Since the current implementation of the lambda calculus to Java transpiler only supports Church Booleans, logic, and pairs, the next step would be to expand its use to include more complex lambda abstractions. The next, most interesting feature to build would be the representation of Church Numerals. With this functionality, the implementation of standard mathematical operations, such as addition and multiplication, follows.
+
+\section{Conclusion}
+
+Building a transpiler that can transform lambda expressions into compilable Java code provided a starting point for implementing the formality and structure of the lambda calculus as its own programming language. A strong point of the transpiler's capabilities is the inherent design for allowing the combination of terms to produce complex functional compositions. 
+\\
+\\
+Source code is available at \texttt{https://github.com/christinequintana/lambda-calc-transpiler}.
+
+\begin{thebibliography}{9}
+
+\bibitem{church}
+	Alonzo Church. The Calculi of Lambda Conversion. Princeton University Press, 1941.
+\bibitem{tapl}
+	Benjamin C. Pierce. Types and Programming Languages. MIT Press, 2002.
+
+\end{thebibliography}
+
+\end{document}
